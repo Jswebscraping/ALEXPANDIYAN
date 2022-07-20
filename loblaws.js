@@ -9,29 +9,28 @@ const fs = require("fs");
     const page = await browser.newPage();
     
     const output = [];
-    const output1 = [];
-    const output2 = [];
+    
+    
     console.log("ok");
 
-   for(i=0;i<10;i++){
+   for(i=0;i<3;i++){
         await page.goto('https://www.loblaws.ca/',{ waitUntil: 'networkidle2', timeout: 0 });
         const searchbox = await page.waitForSelector('.search-input__input');
         await searchbox.type(work[i]);
         await page.keyboard.press('Enter');
         console.log(work[i]);
         const key=work[i];
-        const o=48;
+        const o=3;
         for(var j=0;j<o;j++)
         {
             await page.waitForSelector('.product-tile-group__list__item',{ waitUntil: 'networkidle2', timeout: 0 });
             const search = await page.$$('.product-tile-group__list__item');
             
-            const p=await search[j].$eval('.product-tile__details__info__name',h3=>h3.innerText);
-            const q=await search[j].$eval('.price__value ',span=>span.innerText);
-            const r=await search[j].$eval('.comparison-price-list',ul=>ul.innerText);
-            
-            console.log("title:",p,"\n price",q,"\ncompprice",r)
-            output1.push({
+            const p=await page.$eval('.product-tile__details__info__name',h3=>h3.innerText,search[j]);
+            const q=await page.$eval('.price__value ',span=>span.innerText,search[j]);
+            const r=await page.$eval('.comparison-price-list',ul=>ul.innerText,search[j]);
+        
+            output.push({
                 title:key,
                 product:p,
                 productprice:q,
@@ -39,55 +38,21 @@ const fs = require("fs");
 
             })
         
-        }}  await page.goto('https://www.loblaws.ca/',{ waitUntil: 'networkidle2', timeout: 0 });
-        const searchbox = await page.waitForSelector('.search-input__input');
-        await searchbox.type(work[i]);
-        await page.keyboard.press('Enter');
-        console.log(work[i]);
-        const key=work[i];
-        const o=15;
-        for(var j=0;j<o;j++)
-        {
-            await page.waitForSelector('.product-tile-group__list__item',{ waitUntil: 'networkidle2', timeout: 0 });
-            const search = await page.$$('.product-tile-group__list__item');
-            
-            const p=await search[j].$eval('.product-tile__details__info__name',h3=>h3.innerText);
-            const q=await search[j].$eval('.price__value ',span=>span.innerText);
-            const r=await search[j].$eval('.comparison-price-list',ul=>ul.innerText);
-            
-            console.log("title:",p,"\n price",q,"\ncompprice",r)
-            output2.push({
-                title:key,
-                product:p,
-                productprice:q,
-                compprice:r
-
-            })
-        
+        } 
         }
-        output.push({
-            output1,
-            output2
-        })
       
-            //console.log(output);
+            console.log(output);
     
-            var result=JSON.stringify(output,null,2)
-            fs.writeFile('details.json',result, function (err) {
-                if (err) {
-                    return console.log(err);
-                }
-                console.log("file created");
-            })
-        
-        
+            fs.writeFile("loblaws.json",JSON.stringify(output,'',2),(err) => {
+                if(err){console.log(err)}
+                else{console.log('URL Saved Successfully')};
+            });       
        
    
             await browser.close();}
     catch(e)
         {
-            //console.log("error",e);
+            console.log("error",e);
         }
 })();
        
-                     
